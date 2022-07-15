@@ -1,10 +1,10 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import ModalContext from '../../contexts/modal-context';
-import { createContact } from '../../services/contact.service';
+import { createContact, updateContact } from '../../services/contact.service';
 import './contact-modal.scss';
 
-const ContactModal = () => {
+const ContactModal = ({isEditing, userToEdit,setEmptyUserToEdit}) => {
   const modalContext = useContext(ModalContext);
   const [formDisabled, setFormDisabled] = useState(false);
 
@@ -14,6 +14,7 @@ const ContactModal = () => {
     handleSubmit,
     register,
     reset,
+    setValue
   } = useForm();
 
   const { append, fields, remove } = useFieldArray({
@@ -23,7 +24,7 @@ const ContactModal = () => {
 
   const onValid = (data) => {
     setFormDisabled(true);
-    createContact(data).then(
+    createContact(data,userToEdit.Id).then(
       (response) => {
         modalContext.closeModal();
         reset();
@@ -35,8 +36,19 @@ const ContactModal = () => {
     );
   };
 
+  const onUpdate =(data)=>{
+    setFormDisabled(true);
+    updateContact(data, userToEdit.id).then((response)=>{
+      modalContext.closeModal();
+      reset();
+      setFormDisabled(false);
+      setEmptyUserToEdit();
+    })
+  }
+
   const onClose = () => {
     modalContext.closeModal();
+    setEmptyUserToEdit();
     reset();
   };
 
@@ -52,11 +64,19 @@ const ContactModal = () => {
     }
   };
 
+  useEffect(() => {
+    console.log(isEditing);
+    if (isEditing) {
+      const fields = ['firstName', 'lastName', 'emailAddress', 'phoneNumbers'];
+      fields.forEach(field => setValue(field, userToEdit[field]));     
+    }   
+  }, [userToEdit, isEditing]);
+
   return (
     <div className={`modal ${modalContext.showModal ? 'is-active' : ''}`}>
       <div className="modal-background"></div>
       <div className="modal-content">
-        <form className="box contact-form" onSubmit={handleSubmit(onValid)}>
+        <form className="box contact-form" onSubmit={handleSubmit(!isEditing ? onValid : onUpdate)}>
           <div className="field">
             <label className="label">
               First Name<span className="required">*</span>
@@ -68,6 +88,8 @@ const ContactModal = () => {
                 className={`input ${errors.firstName ? 'error' : ''}`}
                 type="text"
                 disabled={formDisabled}
+                //value={isEditing ? userToEdit.firstName : ''}
+               // onChange={(e)=>updateUser(e, 'firstName')}
               />
             </div>
           </div>
@@ -82,6 +104,8 @@ const ContactModal = () => {
                 className={`input ${errors.lastName ? 'error' : ''}`}
                 type="text"
                 disabled={formDisabled}
+               // value={isEditing ? userToEdit.lastName : ''}
+               // onChange={(e)=>updateUser(e,'lastName')}
               />
             </div>
           </div>
@@ -96,6 +120,8 @@ const ContactModal = () => {
                 className={`input ${errors.emailAddress ? 'error' : ''}`}
                 type="text"
                 disabled={formDisabled}
+               // value={isEditing ? userToEdit.emailAddress :''}
+                //onChange={(e)=>{updateUser(e,'emailAddress')}}
               />
             </div>
           </div>
@@ -115,6 +141,7 @@ const ContactModal = () => {
                       type="text"
                       disabled={formDisabled}
                       placeholder="Enter phone number (required)"
+                    //  value={isEditing && item !== undefined ? item.phoneNumber :''}
                     />
                   </div>
                 </div>
@@ -128,6 +155,7 @@ const ContactModal = () => {
                       {...register(`phoneNumbers.${index}.phoneType`, { required: true })}
                       className={`${getPhoneTypeError(index) ? 'error' : ''}`}
                       placeholder="Enter phone type (required)"
+                   //   value={isEditing && item !== undefined ? item.phoneType : ""}
                     >
                       <option value="">Enter Phone Type (required)</option>
                       <option value="Home">Home</option>
@@ -152,7 +180,7 @@ const ContactModal = () => {
           <br />
           <div className="buttons is-centered">
             <button type="submit" className="button is-primary" disabled={formDisabled}>
-              Submit
+              {isEditing ? "Update" : "Submit"}
             </button>
           </div>
         </form>

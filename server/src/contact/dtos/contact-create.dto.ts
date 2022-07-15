@@ -2,6 +2,9 @@ import { ArrayUnique, IsEmail, IsNotEmpty, IsOptional, ValidateNested } from 'cl
 import { PhoneCreateDto } from '../../phone/dtos/phone-create.dto';
 
 export class ContactCreateDto {
+  @IsOptional()
+  id: number;
+
   @IsNotEmpty()
   firstName: string;
 

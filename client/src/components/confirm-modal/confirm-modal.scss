@@ -1,0 +1,49 @@
+.contact-form {
+  label.checkbox {
+    font-size: 15px;
+    font-weight: 700;
+    padding-left: 48px;
+    padding-top: 10px;
+
+    input {
+      margin-right: 16px;
+      transform: scale(2.6);
+    }
+  }
+
+  label .required {
+    color: red;
+    margin-left: 2px;
+  }
+
+  .field {
+    label span.error {
+      color: red;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+
+    input.error,
+    select.error {
+      border-color: red;
+    }
+  }
+
+  .field-row {
+    .field {
+      display: inline-block;
+
+      &.phone-number,
+      &.phone-type {
+        margin-right: 4px;
+        width: 40%;
+      }
+
+      &.phone-remove {
+        width: 15%;
+      }
+    }
+  }
+}

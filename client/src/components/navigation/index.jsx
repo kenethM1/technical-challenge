@@ -8,10 +8,14 @@ const Navigation = () => {
   const startMenuItems = () => {
     const items = [];
 
-    items.push(
+    items.push([
       <NavLink key="contacts" className="navbar-item" to="/contacts" activeClassName="active">
         Contacts
+      </NavLink>,
+      <NavLink key="calls" className="navbar-item" to="/calls" activeClassName="active">
+        Calls
       </NavLink>
+    ]
     );
 
     return items;
